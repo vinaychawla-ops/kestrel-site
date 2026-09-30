@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Kestrel // Homelab Network Telemetry</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>:root { --bg: #0B0E14; --surface: #151A23; --surface-subtle: #191C22; --border: #232A36; --text: #E8EAF0; --text-muted: #94A3B8; --teal: #2DD4BF; --teal-glow: rgba(45, 212, 191, 0.35); --amber: #F59E0B; --max-width: 1200px; } @layer base { html, body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } nav[data-active-classes] a.active { border-top: 2px solid var(--teal); color: var(--teal) !important; padding-top: calc(0.5rem - 2px); } .mobile-menu-active { display: flex !important; }
+    /* Cleanup: visible keyboard focus indicator (WCAG 2.4.7) */
+    :focus-visible {
+      outline: 2px solid #2DD4BF;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-on-surface": "#2e3037", "background": "#10131a", "on-primary-fixed-variant": "#005047", "on-primary-container": "#00574d", "surface-container-low": "#191c22", "error": "#ffb4ab", "on-background": "#e1e2eb", "on-secondary-container": "#5b3800", "error-container": "#93000a", "primary-fixed-dim": "#3cddc7", "outline-variant": "#3c4a46", "on-secondary-fixed-variant": "#653e00", "on-primary-fixed": "#00201c", "surface-tint": "#3cddc7", "surface-dim": "#10131a", "on-surface-variant": "#bacac5", "tertiary-fixed-dim": "#4edea3", "inverse-surface": "#e1e2eb", "surface-container-highest": "#32353c", "on-tertiary-container": "#00593b", "secondary": "#ffb95f", "on-error-container": "#ffdad6", "surface": "#10131a", "surface-container-high": "#272a31", "inverse-primary": "#006b5f", "outline": "#859490", "primary": "#57f1db", "surface-container-lowest": "#0b0e14", "secondary-container": "#ee9800", "on-surface": "#e1e2eb", "tertiary-container": "#44d69b", "secondary-fixed": "#ffddb8", "on-error": "#690005", "primary-fixed": "#62fae3", "on-tertiary-fixed": "#002113", "tertiary": "#66f3b6", "primary-container": "#2dd4bf", "on-tertiary-fixed-variant": "#005236", "tertiary-fixed": "#6ffbbe", "secondary-fixed-dim": "#ffb95f", "on-secondary": "#472a00", "on-primary": "#003731", "surface-variant": "#32353c", "surface-container": "#1d2026", "surface-bright": "#363940", "on-tertiary": "#003824", "on-secondary-fixed": "#2a1700" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1.5rem", "space-xl": "2rem", "space-2xl": "3rem", "gutter-mobile": "1rem", "space-md": "1rem", "space-sm": "0.75rem", "space-xs": "0.5rem", "margin": "2rem", "space-lg": "1.5rem", "margin-mobile": "1rem" }, fontFamily: { "headline-md": ["Space Grotesk"], "label-md": ["JetBrains Mono"], "headline-xl": ["Space Grotesk"], "body-sm": ["Inter"], "code-lg": ["JetBrains Mono"], "headline-sm": ["Space Grotesk"], "code-sm": ["JetBrains Mono"], "label-sm": ["JetBrains Mono"], "headline-xl-mobile": ["Space Grotesk"], "code-md": ["JetBrains Mono"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Space Grotesk"] }, fontSize: { "headline-md": ["24px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "headline-xl": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "21px", "letterSpacing": "0", "fontWeight": "400" }], "code-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "headline-sm": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "code-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-xl-mobile": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "code-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-md": ["16px", { "lineHeight": "25.6px", "letterSpacing": "0", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28.8px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased selection:bg-primary selection:text-surface-container-lowest"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-[#0B0E14]/90 backdrop-blur-md border-b border-[#232A36]"><div class="h-16 max-w-[1200px] mx-auto px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><a class="flex items-center gap-space-xs" data-path="home" href="#"><img alt="Kestrel Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W8aqeX7EH-Xmmv-BmeQi1bhi7RV7mr7aAEXCD-8qbFiP8DKwpkAq-BeRG9-765GXOc-UKCIQu1ePLnW5qVluQ2zH7MejlCzsUSGll7FysDGYhd-R54UaIY7gHDU3wJgM08I-H9Qi5FIDXtc-pX0gjI4O0wgU3s37vcplgAcceYt7eP5wCEsXhehZR_Jr1lXwoTazaSA5IZtmWQ31YS02nY3a539AMJ1tBg4pYWL4TGiGPN4ihuqjF-Uw"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">KESTREL</span></a><span class="hidden sm:inline-flex items-center ml-2 px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant font-label-sm text-label-sm text-primary uppercase">v1.4 core</span></div><nav class="hidden md:flex items-center gap-space-lg h-full" data-active-classes="border-t-2 border-primary text-primary font-bold"><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="features" href="features.html">Features</a><a aria-current="page" class="h-full flex items-center transition-colors border-t-2 border-primary text-primary font-bold" data-path="pricing" href="pricing.html">Pricing</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="docs.html">Docs</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="about.html">About</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="contact.html">Contact</a></nav><div class="flex items-center gap-space-sm"><a class="hidden sm:inline-flex items-center justify-center px-5 py-2 rounded-full bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-all duration-200 shadow-[0_0_16px_rgba(45,212,191,0.25)] hover:shadow-[0_0_20px_rgba(45,212,191,0.45)]" data-path="downloads" href="#">Download v1.4</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Toggle Mobile Menu" class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-surface-container-high text-on-surface hover:text-primary transition-colors" id="mobile-toggle" aria-expanded="false"><span class="material-symbols-outlined">menu</span></button></div></div><div class="hidden md:hidden flex-col w-full bg-[#151A23] border-b border-[#232A36] px-gutter py-space-md space-y-space-sm" id="mobile-nav"><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="features" href="features.html">Features</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="pricing" href="pricing.html">Pricing</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="documentation" href="docs.html">Docs</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="about" href="about.html">About</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="contact" href="contact.html">Contact</a><div class="pt-space-xs border-t border-[#232A36]"><a class="inline-flex w-full items-center justify-center px-4 py-2.5 rounded-full bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold" data-path="downloads" href="#">Download v1.4</a></div></div></header><main class="w-full pt-16 bg-surface-container-lowest min-h-screen" id="main-content"><div class="flex flex-col w-full">
+<div class="w-full relative overflow-hidden bg-surface-container-lowest">
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-primary/10 rounded-full blur-[140px] pointer-events-none"></div>
+<div class="max-w-[1200px] mx-auto px-gutter py-space-xl relative z-10 flex flex-col items-center text-center">
+<div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-surface-container-high font-label-sm text-label-sm text-primary uppercase tracking-widest mb-space-md">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        Zero Telemetry • Zero Tiered Locks
+      </div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface max-w-4xl tracking-tight mb-space-sm">
+        Simple, Honest Pricing. Free Forever for Homelabs.
+      </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+        Kestrel core is 100% free and open source. No node limits, no locked features, no bait-and-switch.
+      </p>
+<div class="mt-space-lg flex items-center gap-2 p-1.5 rounded-full bg-surface-container-high">
+<button class="px-5 py-1.5 rounded-full font-label-md text-label-md transition-all text-on-surface bg-surface-container-low shadow-sm font-semibold" id="billing-monthly">Monthly</button>
+<button class="px-5 py-1.5 rounded-full font-label-md text-label-md transition-all text-on-surface-variant hover:text-on-surface" id="billing-lifetime">Lifetime Supporter (-18%)</button>
+</div>
+</div>
+</div>
+<section class="max-w-[1200px] mx-auto px-gutter w-full pb-space-2xl">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg items-stretch">
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container shadow-md">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest px-2.5 py-1 rounded-full bg-surface-container-high">
+              AGPLv3 Open Source
+            </span>
+<span class="material-symbols-outlined text-outline text-[20px]">terminal</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-space-xs">Homelabber Community</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Complete native diagnostics for self-hosters and edge hardware architects.</p>
+<div class="flex items-baseline gap-1 mb-space-lg">
+<span class="font-headline-xl text-headline-xl text-on-surface font-bold">$0</span>
+<span class="font-code-md text-code-md text-outline">/ forever</span>
+</div>
+<div class="w-full h-px bg-surface-variant mb-space-lg"></div>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant mb-space-sm">Engineered Core Inclusions:</p>
+<ul class="space-y-space-sm font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span class="text-on-surface font-medium">Unlimited local nodes &amp; containers</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>All probe types (ICMP, TCP, HTTP, DNS)</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>Automated topology graph engine</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>Unlimited webhook &amp; alert channels</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>Embedded zero-config SQLite storage</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>Community Discord &amp; forum support</span>
+</li>
+</ul>
+</div>
+<div class="pt-space-xl mt-auto">
+<a class="w-full inline-flex items-center justify-center py-3 px-6 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm font-semibold transition-all" href="#">
+            Deploy Free Now
+          </a>
+</div>
+</div>
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container p-space-lg transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-primary/5">
+<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase tracking-wider shadow-sm">
+          Most Popular / Keep Kestrel Independent
+        </div>
+<div class="flex flex-col mt-2">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest px-2.5 py-1 rounded-full bg-surface-container-high">
+              Direct Sustainer
+            </span>
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-space-xs">Homelab Supporter</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Fund full-time development without locking critical monitoring capabilities.</p>
+<div class="flex items-baseline gap-1 mb-space-lg">
+<span class="font-headline-xl text-headline-xl text-primary font-bold" id="supporter-price">$5</span>
+<span class="font-code-md text-code-md text-on-surface-variant" id="supporter-period">/ month</span>
+</div>
+<div class="w-full h-px bg-surface-variant mb-space-lg"></div>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-primary mb-space-sm">Everything in Community, plus:</p>
+<ul class="space-y-space-sm font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified</span>
+<span class="text-on-surface">Supporter badge in Discord &amp; GitHub</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">deployed_code</span>
+<span class="text-on-surface font-medium">Early access to pre-release binaries &amp; plugins</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">how_to_vote</span>
+<span>Vote on roadmap feature priorities</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">palette</span>
+<span>Custom dark dashboard themes pack</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">coffee</span>
+<span>Direct access to core maintainer office hours</span>
+</li>
+</ul>
+</div>
+<div class="pt-space-xl mt-auto">
+<a class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-primary-container hover:bg-primary text-on-primary font-body-sm text-body-sm font-semibold transition-all shadow-[0_0_20px_rgba(45,212,191,0.25)] hover:shadow-[0_0_26px_rgba(45,212,191,0.45)]" href="#">
+            Become a Supporter
+          </a>
+</div>
+</div>
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container shadow-md">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest px-2.5 py-1 rounded-full bg-surface-container-high">
+              Commercial &amp; Lab Sponsors
+            </span>
+<span class="material-symbols-outlined text-secondary text-[20px]">domain</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-space-xs">Small Lab / Business</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Structured support, verified company attribution, and express ticket review.</p>
+<div class="flex items-baseline gap-1 mb-space-lg">
+<span class="font-headline-xl text-headline-xl text-on-surface font-bold">$25</span>
+<span class="font-code-md text-code-md text-outline">/ month</span>
+</div>
+<div class="w-full h-px bg-surface-variant mb-space-lg"></div>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-secondary mb-space-sm">Everything in Supporter, plus:</p>
+<ul class="space-y-space-sm font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">workspace_premium</span>
+<span class="text-on-surface font-medium">Listed sponsor on GitHub README &amp; site</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">bolt</span>
+<span class="text-on-surface">Priority issue triage by core maintainers</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">contact_mail</span>
+<span>Direct private email channel</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">receipt_long</span>
+<span>Formal VAT &amp; compliant invoice billing</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">security</span>
+<span>CVE advance security patch advisories</span>
+</li>
+</ul>
+</div>
+<div class="pt-space-xl mt-auto">
+<a class="w-full inline-flex items-center justify-center py-3 px-6 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm font-semibold transition-all" href="#">
+            Sponsor Kestrel
+          </a>
+</div>
+</div>
+</div>
+</section>
+<section class="max-w-[1200px] mx-auto px-gutter w-full mb-space-2xl">
+<div class="relative overflow-hidden rounded-xl bg-surface-container p-space-xl shadow-lg">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg relative z-10">
+<div class="max-w-2xl space-y-space-xs">
+<div class="flex items-center gap-space-xs text-primary font-label-md text-label-md uppercase tracking-wider">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+            Immutable Philosophy
+          </div>
+<h2 class="font-headline-md text-headline-md text-on-surface">The Open Source Promise</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            We will never paywall monitoring features, cap node counts, or introduce closed-source telemetry. Kestrel is built under AGPLv3 to stay genuinely self-hostable forever.
+          </p>
+</div>
+<div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high font-code-sm text-code-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">lock_open</span>
+            100% Free Core Audited
+          </div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high font-code-sm text-code-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">visibility_off</span>
+            Zero Analytics Beacons
+          </div>
+</div>
+</div>
+</div>
+</section>
+<section class="max-w-[1200px] mx-auto px-gutter w-full mb-space-2xl">
+<div class="text-center mb-space-xl">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest block mb-space-xs">Detailed Inquiries</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Frequently Asked Questions</h2>
+</div>
+<div class="max-w-3xl mx-auto space-y-space-sm">
+<details class="group rounded-xl bg-surface-container-low transition-colors duration-200 open:bg-surface-container">
+<summary class="flex cursor-pointer items-center justify-between p-space-lg font-headline-sm text-headline-sm text-on-surface select-none list-none">
+<span>Is the free tier really free?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-space-lg pb-space-lg font-body-md text-body-md text-on-surface-variant">
+          Yes. Hobby is free forever: 25 devices, 1-minute checks, and community support. No credit card, no trial countdown, no telemetry paywall — the free tier runs the same local engine as paid plans.
+        </div>
+</details>
+<details class="group rounded-xl bg-surface-container-low transition-colors duration-200 open:bg-surface-container">
+<summary class="flex cursor-pointer items-center justify-between p-space-lg font-headline-sm text-headline-sm text-on-surface select-none list-none">
+<span>Does Kestrel phone home?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-space-lg pb-space-lg font-body-md text-body-md text-on-surface-variant">
+          No. Kestrel is self-hosted, so every check, device record, and alert stays on your own network. The only outbound connection is an optional update check, which you can disable entirely.
+        </div>
+</details>
+<details class="group rounded-xl bg-surface-container-low transition-colors duration-200 open:bg-surface-container">
+<summary class="flex cursor-pointer items-center justify-between p-space-lg font-headline-sm text-headline-sm text-on-surface select-none list-none">
+<span>Which platforms are supported?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-space-lg pb-space-lg font-body-md text-body-md text-on-surface-variant">
+          Anywhere Docker runs, plus a single static binary for Linux (amd64 and arm64) — one ~15MB file, SQLite under the hood, no dependencies to babysit.
+        </div>
+</details>
+<details class="group rounded-xl bg-surface-container-low transition-colors duration-200 open:bg-surface-container">
+<summary class="flex cursor-pointer items-center justify-between p-space-lg font-headline-sm text-headline-sm text-on-surface select-none list-none">
+<span>Can I migrate from another monitoring tool?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-space-lg pb-space-lg font-body-md text-body-md text-on-surface-variant">
+          Yes. Import your devices over CSV or the REST API, and bring your check intervals with them. Most homelabs are fully migrated in an afternoon.
+        </div>
+</details>
+<details class="group rounded-xl bg-surface-container-low transition-colors duration-200 open:bg-surface-container">
+<summary class="flex cursor-pointer items-center justify-between p-space-lg font-headline-sm text-headline-sm text-on-surface select-none list-none">
+<span>How do push notifications work?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-space-lg pb-space-lg font-body-md text-body-md text-on-surface-variant">
+          The moment a check fails, Kestrel pushes an alert through your chosen provider — ntfy, Gotify, Pushover, or plain webhooks — usually before anyone in the house notices anything is wrong.
+        </div>
+</details>
+</div>
+</section>
+<div class="max-w-[1200px] mx-auto px-gutter w-full pb-space-2xl">
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md p-space-lg rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">code</span>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Inspect the codebase</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Check our commit logs, license declaration, and independent build pipelines.</p>
+</div>
+</div>
+<a class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md uppercase tracking-wider transition-colors shrink-0" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub Repository</span>
+<span class="material-symbols-outlined text-[16px]">arrow_outward</span>
+</a>
+</div>
+</div>
+<script>
+    const monthlyBtn = document.getElementById('billing-monthly');
+    const lifetimeBtn = document.getElementById('billing-lifetime');
+    const supporterPrice = document.getElementById('supporter-price');
+    const supporterPeriod = document.getElementById('supporter-period');
+
+    if (monthlyBtn && lifetimeBtn && supporterPrice && supporterPeriod) {
+      monthlyBtn.addEventListener('click', () => {
+        monthlyBtn.classList.add('bg-surface-container-low', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        monthlyBtn.classList.remove('text-on-surface-variant');
+        lifetimeBtn.classList.remove('bg-surface-container-low', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        lifetimeBtn.classList.add('text-on-surface-variant');
+        supporterPrice.textContent = '$5';
+        supporterPeriod.textContent = '/ month';
+      });
+
+      lifetimeBtn.addEventListener('click', () => {
+        lifetimeBtn.classList.add('bg-surface-container-low', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        lifetimeBtn.classList.remove('text-on-surface-variant');
+        monthlyBtn.classList.remove('bg-surface-container-low', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        monthlyBtn.classList.add('text-on-surface-variant');
+        supporterPrice.textContent = '$49';
+        supporterPeriod.textContent = '/ lifetime';
+      });
+    }
+  </script>
+</div></main><footer class="w-full bg-[#151A23] border-t border-[#232A36] pt-space-2xl pb-space-xl text-on-surface"><div class="max-w-[1200px] mx-auto px-gutter"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-2xl"><div class="lg:col-span-2 pr-0 lg:pr-space-xl space-y-space-md"><div class="flex items-center gap-space-xs"><img alt="Kestrel Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W8aqeX7EH-Xmmv-BmeQi1bhi7RV7mr7aAEXCD-8qbFiP8DKwpkAq-BeRG9-765GXOc-UKCIQu1ePLnW5qVluQ2zH7MejlCzsUSGll7FysDGYhd-R54UaIY7gHDU3wJgM08I-H9Qi5FIDXtc-pX0gjI4O0wgU3s37vcplgAcceYt7eP5wCEsXhehZR_Jr1lXwoTazaSA5IZtmWQ31YS02nY3a539AMJ1tBg4pYWL4TGiGPN4ihuqjF-Uw"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">KESTREL</span></div><p class="font-body-sm text-body-sm text-[#94A3B8] max-w-sm">Engineered for self-hosters and network architects. Continuous passive topology telemetry, localized packet diagnostics, and zero cloud footprint.</p><div class="space-y-space-xs pt-space-xs"><label class="block font-label-sm text-label-sm text-[#94A3B8] uppercase tracking-wider" for="newsletter-email">Stay tuned to releases</label><form class="flex items-center gap-2 max-w-sm" onsubmit="event.preventDefault();"><input class="w-full h-10 px-3 rounded-lg bg-[#0B0E14] border border-[#232A36] font-code-sm text-code-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none transition-colors" id="newsletter-email" placeholder="sysadmin@homelab.internal" type="email"/><button class="h-10 px-4 rounded-lg bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-colors whitespace-nowrap" type="submit">Subscribe</button></form></div></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Product</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="features" href="features.html">Features</a></li><li><a class="hover:text-primary transition-colors" data-path="architecture" href="#">Architecture</a></li><li><a class="hover:text-primary transition-colors" data-path="integrations" href="#">Integrations</a></li><li><a class="hover:text-primary transition-colors" data-path="changelog" href="#">Changelog</a></li><li><a class="hover:text-primary transition-colors" data-path="releases" href="#">Releases</a></li></ul></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Community</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="community-discord" href="#">Discord Homelab</a></li><li><a class="hover:text-primary transition-colors" data-path="community-reddit" href="#">Reddit r/homelab</a></li><li><a class="hover:text-primary transition-colors" data-path="community-github" href="#">GitHub</a></li><li><a class="hover:text-primary transition-colors" data-path="community-forum" href="#">Forum</a></li></ul></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Resources</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="documentation" href="docs.html">Documentation</a></li><li><a class="hover:text-primary transition-colors" data-path="self-hosting-guide" href="#">Self-Hosting Guide</a></li><li><a class="hover:text-primary transition-colors" data-path="docker-compose" href="#">Docker / Compose</a></li><li><a class="hover:text-primary transition-colors" data-path="rest-api" href="#">REST API</a></li></ul></div></div><div class="pt-space-lg border-t border-[#232A36] flex flex-col md:flex-row items-center justify-between gap-space-sm"><p class="font-code-sm text-code-sm text-[#94A3B8]">© 2025 Kestrel Systems. Open source under AGPLv3. Zero cloud telemetry.</p><div class="flex items-center gap-space-md font-code-sm text-code-sm text-[#94A3B8]"><a class="hover:text-on-surface transition-colors" data-path="about" href="about.html">About Kestrel</a><a class="hover:text-on-surface transition-colors" data-path="manifesto" href="#">Open Source Manifesto</a><a class="hover:text-on-surface transition-colors" data-path="security-and-telemetry" href="#">Security &amp; Telemetry</a><a class="hover:text-on-surface transition-colors" data-path="contact" href="contact.html">Contact</a></div></div></div></footer><script>const toggleBtn = document.getElementById('mobile-toggle'); const mobileNav = document.getElementById('mobile-nav'); if (toggleBtn && mobileNav) { toggleBtn.addEventListener('click', () => { mobileNav.classList.toggle('hidden'); mobileNav.classList.toggle('mobile-menu-active'); toggleBtn.setAttribute('aria-expanded', String(!mobileNav.classList.contains('hidden'))); }); }</script></body></html>

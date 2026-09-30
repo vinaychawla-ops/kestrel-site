@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Kestrel // Homelab Network Telemetry</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>:root { --bg: #0B0E14; --surface: #151A23; --surface-subtle: #191C22; --border: #232A36; --text: #E8EAF0; --text-muted: #94A3B8; --teal: #2DD4BF; --teal-glow: rgba(45, 212, 191, 0.35); --amber: #F59E0B; --max-width: 1200px; } @layer base { html, body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } nav[data-active-classes] a.active { border-top: 2px solid var(--teal); color: var(--teal) !important; padding-top: calc(0.5rem - 2px); } .mobile-menu-active { display: flex !important; }
+    /* Cleanup: visible keyboard focus indicator (WCAG 2.4.7) */
+    :focus-visible {
+      outline: 2px solid #2DD4BF;
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-on-surface": "#2e3037", "background": "#10131a", "on-primary-fixed-variant": "#005047", "on-primary-container": "#00574d", "surface-container-low": "#191c22", "error": "#ffb4ab", "on-background": "#e1e2eb", "on-secondary-container": "#5b3800", "error-container": "#93000a", "primary-fixed-dim": "#3cddc7", "outline-variant": "#3c4a46", "on-secondary-fixed-variant": "#653e00", "on-primary-fixed": "#00201c", "surface-tint": "#3cddc7", "surface-dim": "#10131a", "on-surface-variant": "#bacac5", "tertiary-fixed-dim": "#4edea3", "inverse-surface": "#e1e2eb", "surface-container-highest": "#32353c", "on-tertiary-container": "#00593b", "secondary": "#ffb95f", "on-error-container": "#ffdad6", "surface": "#10131a", "surface-container-high": "#272a31", "inverse-primary": "#006b5f", "outline": "#859490", "primary": "#57f1db", "surface-container-lowest": "#0b0e14", "secondary-container": "#ee9800", "on-surface": "#e1e2eb", "tertiary-container": "#44d69b", "secondary-fixed": "#ffddb8", "on-error": "#690005", "primary-fixed": "#62fae3", "on-tertiary-fixed": "#002113", "tertiary": "#66f3b6", "primary-container": "#2dd4bf", "on-tertiary-fixed-variant": "#005236", "tertiary-fixed": "#6ffbbe", "secondary-fixed-dim": "#ffb95f", "on-secondary": "#472a00", "on-primary": "#003731", "surface-variant": "#32353c", "surface-container": "#1d2026", "surface-bright": "#363940", "on-tertiary": "#003824", "on-secondary-fixed": "#2a1700" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1.5rem", "space-xl": "2rem", "space-2xl": "3rem", "gutter-mobile": "1rem", "space-md": "1rem", "space-sm": "0.75rem", "space-xs": "0.5rem", "margin": "2rem", "space-lg": "1.5rem", "margin-mobile": "1rem" }, fontFamily: { "headline-md": ["Space Grotesk"], "label-md": ["JetBrains Mono"], "headline-xl": ["Space Grotesk"], "body-sm": ["Inter"], "code-lg": ["JetBrains Mono"], "headline-sm": ["Space Grotesk"], "code-sm": ["JetBrains Mono"], "label-sm": ["JetBrains Mono"], "headline-xl-mobile": ["Space Grotesk"], "code-md": ["JetBrains Mono"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Space Grotesk"] }, fontSize: { "headline-md": ["24px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "headline-xl": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "body-sm": ["14px", { "lineHeight": "21px", "letterSpacing": "0", "fontWeight": "400" }], "code-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "headline-sm": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "code-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" }], "headline-xl-mobile": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "code-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-md": ["16px", { "lineHeight": "25.6px", "letterSpacing": "0", "fontWeight": "400" }], "body-lg": ["18px", { "lineHeight": "28.8px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased selection:bg-primary selection:text-surface-container-lowest"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-[#0B0E14]/90 backdrop-blur-md border-b border-[#232A36]"><div class="h-16 max-w-[1200px] mx-auto px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><a class="flex items-center gap-space-xs" data-path="home" href="#"><img alt="Kestrel Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W8aqeX7EH-Xmmv-BmeQi1bhi7RV7mr7aAEXCD-8qbFiP8DKwpkAq-BeRG9-765GXOc-UKCIQu1ePLnW5qVluQ2zH7MejlCzsUSGll7FysDGYhd-R54UaIY7gHDU3wJgM08I-H9Qi5FIDXtc-pX0gjI4O0wgU3s37vcplgAcceYt7eP5wCEsXhehZR_Jr1lXwoTazaSA5IZtmWQ31YS02nY3a539AMJ1tBg4pYWL4TGiGPN4ihuqjF-Uw"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">KESTREL</span></a><span class="hidden sm:inline-flex items-center ml-2 px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant font-label-sm text-label-sm text-primary uppercase">v1.4 core</span></div><nav class="hidden md:flex items-center gap-space-lg h-full" data-active-classes="border-t-2 border-primary text-primary font-bold"><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="features" href="features.html">Features</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="pricing" href="pricing.html">Pricing</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="documentation" href="docs.html">Docs</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="about.html">About</a><a class="h-full flex items-center text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="contact.html">Contact</a></nav><div class="flex items-center gap-space-sm"><a class="hidden sm:inline-flex items-center justify-center px-5 py-2 rounded-full bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-all duration-200 shadow-[0_0_16px_rgba(45,212,191,0.25)] hover:shadow-[0_0_20px_rgba(45,212,191,0.45)]" data-path="downloads" href="#">Download v1.4</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Toggle Mobile Menu" class="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-surface-container-high text-on-surface hover:text-primary transition-colors" id="mobile-toggle" aria-expanded="false"><span class="material-symbols-outlined">menu</span></button></div></div><div class="hidden md:hidden flex-col w-full bg-[#151A23] border-b border-[#232A36] px-gutter py-space-md space-y-space-sm" id="mobile-nav"><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="features" href="features.html">Features</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="pricing" href="pricing.html">Pricing</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="documentation" href="docs.html">Docs</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="about" href="about.html">About</a><a class="block py-2 text-body-sm font-body-sm text-on-surface-variant hover:text-primary" data-path="contact" href="contact.html">Contact</a><div class="pt-space-xs border-t border-[#232A36]"><a class="inline-flex w-full items-center justify-center px-4 py-2.5 rounded-full bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold" data-path="downloads" href="#">Download v1.4</a></div></div></header><main class="w-full pt-16 bg-surface-container-lowest min-h-screen" id="main-content"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1200px] mx-auto px-gutter py-space-xl">
+<div class="flex flex-col lg:flex-row gap-space-2xl relative items-start">
+<!-- STICKY SIDEBAR NAVIGATION -->
+<aside class="w-full lg:w-[240px] shrink-0 lg:sticky lg:top-24 self-start">
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm">
+<div class="flex items-center gap-space-xs mb-space-md px-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Manual Index</span>
+</div>
+<nav class="flex flex-col space-y-1" id="doc-nav">
+<a class="group flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface hover:text-primary hover:bg-surface-container-high transition-all text-body-sm font-body-sm active-nav-link" data-section="getting-started" href="#getting-started">
+<span class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-primary opacity-80 group-hover:opacity-100">01 //</span>
+<span>Getting started</span>
+</span>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+<a class="group flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-body-sm font-body-sm" data-section="installation" href="#installation">
+<span class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-outline group-hover:text-primary">02 //</span>
+<span>Installation</span>
+</span>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+<a class="group flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-body-sm font-body-sm" data-section="configuration" href="#configuration">
+<span class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-outline group-hover:text-primary">03 //</span>
+<span>Configuration</span>
+</span>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+<a class="group flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-body-sm font-body-sm" data-section="alerts" href="#alerts">
+<span class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-outline group-hover:text-primary">04 //</span>
+<span>Alerts &amp; Routing</span>
+</span>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+<a class="group flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-body-sm font-body-sm" data-section="faq" href="#faq">
+<span class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-outline group-hover:text-primary">05 //</span>
+<span>FAQ</span>
+</span>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</a>
+</nav>
+<div class="mt-space-md pt-space-sm px-space-xs bg-surface-container-lowest/40 rounded-lg p-space-sm">
+<div class="text-[11px] font-code-sm text-on-surface-variant flex items-center justify-between">
+<span>TELEMETRY ENGINE</span>
+<span class="text-primary font-semibold">ONLINE</span>
+</div>
+<p class="text-[11px] font-code-sm text-outline mt-1">Direct airgap mode active</p>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT COLUMN -->
+<div class="flex-1 min-w-0 space-y-space-2xl">
+<!-- HEADER & BREADCRUMB -->
+<header class="space-y-space-xs">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high font-label-sm text-label-sm text-primary tracking-widest uppercase">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>// DOCUMENTATION // V1.4 ARCHITECTURE</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">
+            Kestrel Documentation &amp; Operations Manual
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+            Deploy, tune, and operationalize Kestrel’s sovereign, zero-cloud monitoring daemon across personal micro-clusters, bare metal appliances, and rackmount infrastructure.
+          </p>
+</header>
+<!-- SECTION 1: GETTING STARTED -->
+<section class="scroll-mt-24 space-y-space-lg" id="getting-started">
+<div class="flex items-center justify-between bg-surface-container px-space-lg py-space-sm rounded-xl">
+<div class="flex items-center gap-3">
+<span class="font-code-lg text-code-lg text-primary">01</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Getting Started</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase">Prerequisites</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Kestrel runs as a single static binary or micro-container tailored for minimal system footprint. It performs non-destructive passive sniffing, discrete multi-point synthetic probing, and automated topological neighbor discovery using local link protocols (LLDP / ARP / mDNS).
+          </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="bg-surface-container p-space-md rounded-xl space-y-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Compute &amp; Arch</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Linux x86_64 or arm64. Optimized for Raspberry Pi 4/5, Intel NUC, and Proxmox VE hypervisors.</p>
+</div>
+<div class="bg-surface-container p-space-md rounded-xl space-y-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">hard_drive</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Memory Footprint</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Requires less than 8 MB resident set size (RSS). Zero external runtime dependencies or JVM bloat.</p>
+</div>
+<div class="bg-surface-container p-space-md rounded-xl space-y-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">lock_open</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Rootless Execution</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Designed to drop root immediately after binding synthetic socket raw capabilities.</p>
+</div>
+</div>
+<!-- Note Callout Box (Teal Accent) -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-sm flex items-start gap-space-md relative overflow-hidden">
+<div class="w-1 self-stretch rounded-full bg-primary-container shrink-0"></div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-primary">Zero-Cloud Sovereign Guarantee</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Kestrel initiates absolutely zero outbound telemetry pings to external public clouds, analytics servers, or telemetry aggregators. 100% of captured routing maps, switch states, and timeseries latency profiles remain stored locally in your local SQLite WAL volume.
+              </p>
+</div>
+</div>
+</section>
+<!-- SECTION 2: INSTALLATION -->
+<section class="scroll-mt-24 space-y-space-lg" id="installation">
+<div class="flex items-center justify-between bg-surface-container px-space-lg py-space-sm rounded-xl">
+<div class="flex items-center gap-3">
+<span class="font-code-lg text-code-lg text-primary">02</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Installation</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase">Quick Deploy</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            The recommended production method for containerized homelab environments is Docker Compose or standalone Docker CLI with host networking enabled for accurate ARP scanning.
+          </p>
+<!-- Monospace Code Box with Copy Interaction -->
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-md">
+<div class="bg-surface-container-high px-space-md py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error/70 inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-secondary-container/70 inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-primary-container/70 inline-block"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant ml-2">bash // docker deploy</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-lowest text-code-sm font-code-sm transition-all focus:outline-none" id="copy-btn">
+<span class="material-symbols-outlined text-[16px]" id="copy-icon">content_copy</span>
+<span id="copy-text">Copy snippet</span>
+</button>
+</div>
+<div class="p-space-md overflow-x-auto bg-surface-container-lowest/80">
+<pre class="font-code-sm text-code-sm text-on-surface leading-relaxed"><code id="docker-command"><span class="text-primary">docker run</span> -d \
+  <span class="text-on-surface-variant">--name</span> kestrel \
+  <span class="text-on-surface-variant">--restart</span>=unless-stopped \
+  <span class="text-secondary">--net</span>=host \
+  <span class="text-primary-fixed">--cap-add</span>=NET_RAW \
+  <span class="text-primary-fixed">--cap-add</span>=NET_ADMIN \
+  <span class="text-on-surface-variant">-v</span> /var/run/docker.sock:/var/run/docker.sock \
+  <span class="text-on-surface-variant">-v</span> ./kestrel.yaml:/etc/kestrel/kestrel.yaml \
+  <span class="text-on-surface-variant">-p</span> 8080:8080 \
+  ghcr.io/kestrel-network/kestrel:latest</code></pre>
+</div>
+</div>
+<!-- Warning Callout Box (Amber Accent) -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-sm flex items-start gap-space-md relative overflow-hidden">
+<div class="w-1 self-stretch rounded-full bg-secondary shrink-0"></div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">warning</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-secondary">Linux Capabilities Notice</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Both <code class="font-code-sm text-code-sm bg-surface-container-high px-1.5 py-0.5 rounded text-secondary">--cap-add=NET_RAW</code> and <code class="font-code-sm text-code-sm bg-surface-container-high px-1.5 py-0.5 rounded text-secondary">--cap-add=NET_ADMIN</code> are mandatory. They allow the containerized daemon to emit ICMP echo requests without running as root user inside the container namespace.
+              </p>
+</div>
+</div>
+</section>
+<!-- SECTION 3: CONFIGURATION -->
+<section class="scroll-mt-24 space-y-space-lg" id="configuration">
+<div class="flex items-center justify-between bg-surface-container px-space-lg py-space-sm rounded-xl">
+<div class="flex items-center gap-3">
+<span class="font-code-lg text-code-lg text-primary">03</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Configuration</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase">YAML Spec</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Kestrel reads declarative definitions from <code class="font-code-sm text-code-sm bg-surface-container px-2 py-1 rounded text-primary">/etc/kestrel/kestrel.yaml</code>. Hot reloads are triggered automatically upon file alteration using inotify filesystem watches.
+          </p>
+<!-- Table Container without explicit borders -->
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead class="bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant uppercase">
+<tr>
+<th class="py-3 px-4">Parameter</th>
+<th class="py-3 px-4">Type</th>
+<th class="py-3 px-4">Default</th>
+<th class="py-3 px-4">Description</th>
+</tr>
+</thead>
+<tbody class="divide-transparent">
+<tr class="bg-surface-container hover:bg-surface-container-high/60 transition-colors">
+<td class="py-3 px-4 font-code-sm text-code-sm text-primary">check_interval</td>
+<td class="py-3 px-4 text-on-surface-variant font-code-sm text-code-sm">Duration</td>
+<td class="py-3 px-4 font-code-sm text-code-sm text-secondary">10s</td>
+<td class="py-3 px-4 text-on-surface">High-frequency ICMP and TCP ping polling frequency per subnet probe.</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-container-high/60 transition-colors">
+<td class="py-3 px-4 font-code-sm text-code-sm text-primary">timeout</td>
+<td class="py-3 px-4 text-on-surface-variant font-code-sm text-code-sm">Duration</td>
+<td class="py-3 px-4 font-code-sm text-code-sm text-secondary">1500ms</td>
+<td class="py-3 px-4 text-on-surface">Socket read timeout before flagging service latency warning or packet drop.</td>
+</tr>
+<tr class="bg-surface-container hover:bg-surface-container-high/60 transition-colors">
+<td class="py-3 px-4 font-code-sm text-code-sm text-primary">retention_days</td>
+<td class="py-3 px-4 text-on-surface-variant font-code-sm text-code-sm">Integer</td>
+<td class="py-3 px-4 font-code-sm text-code-sm text-secondary">30</td>
+<td class="py-3 px-4 text-on-surface">Local SQLite WAL time-series data retention window before auto-compaction.</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-container-high/60 transition-colors">
+<td class="py-3 px-4 font-code-sm text-code-sm text-primary">notification_channels</td>
+<td class="py-3 px-4 text-on-surface-variant font-code-sm text-code-sm">List&lt;String&gt;</td>
+<td class="py-3 px-4 font-code-sm text-code-sm text-secondary">["pushover", "discord"]</td>
+<td class="py-3 px-4 text-on-surface">Active notification egress targets for priority alert routing.</td>
+</tr>
+<tr class="bg-surface-container hover:bg-surface-container-high/60 transition-colors">
+<td class="py-3 px-4 font-code-sm text-code-sm text-primary">prom_exporter_port</td>
+<td class="py-3 px-4 text-on-surface-variant font-code-sm text-code-sm">Integer</td>
+<td class="py-3 px-4 font-code-sm text-code-sm text-secondary">9090</td>
+<td class="py-3 px-4 text-on-surface">Native Prometheus scrape endpoint for Grafana homelab dashboards.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Configuration Code Snippet -->
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
+<div class="bg-surface-container-high px-space-md py-space-xs flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">kestrel.yaml sample</span>
+<span class="font-label-sm text-label-sm text-outline uppercase">YAML Specification</span>
+</div>
+<div class="p-space-md overflow-x-auto bg-surface-container-lowest/80">
+<pre class="font-code-sm text-code-sm text-on-surface leading-relaxed"><code><span class="text-outline"># Core Telemetry Parameters</span>
+<span class="text-primary">version</span>: <span class="text-secondary">"1.4"</span>
+<span class="text-primary">check_interval</span>: <span class="text-secondary">10s</span>
+<span class="text-primary">timeout</span>: <span class="text-secondary">1500ms</span>
+<span class="text-primary">retention_days</span>: <span class="text-secondary">30</span>
+
+<span class="text-outline"># Active Probe Targets</span>
+<span class="text-primary">subnets</span>:
+  - <span class="text-primary">cidr</span>: <span class="text-secondary">"192.168.1.0/24"</span>
+    <span class="text-primary">label</span>: <span class="text-secondary">"Homelab-LAN"</span>
+    <span class="text-primary">scan_arp</span>: <span class="text-primary-fixed">true</span>
+  - <span class="text-primary">cidr</span>: <span class="text-secondary">"10.0.100.0/24"</span>
+    <span class="text-primary">label</span>: <span class="text-secondary">"IoT-Isolated-VLAN"</span>
+    <span class="text-primary">scan_arp</span>: <span class="text-primary-fixed">false</span>
+
+<span class="text-outline"># Metrics &amp; Monitoring Export</span>
+<span class="text-primary">prom_exporter_port</span>: <span class="text-secondary">9090</span>
+<span class="text-primary">notification_channels</span>:
+  - <span class="text-secondary">"discord"</span>
+  - <span class="text-secondary">"gotify"</span></code></pre>
+</div>
+</div>
+</section>
+<!-- SECTION 4: ALERTS & ROUTING -->
+<section class="scroll-mt-24 space-y-space-lg" id="alerts">
+<div class="flex items-center justify-between bg-surface-container px-space-lg py-space-sm rounded-xl">
+<div class="flex items-center gap-3">
+<span class="font-code-lg text-code-lg text-primary">04</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Alerts &amp; Notification Routing</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase">Webhooks</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Kestrel delivers alert dispatches directly to Discord webhooks, self-hosted Gotify instances, Pushover keys, and Telegram bots without relying on external SaaS forwarders.
+          </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="bg-surface-container rounded-xl p-space-md space-y-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">send</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Webhook Dispatch Payload</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Raw JSON payload dispatched immediately upon packet drop threshold violation:</p>
+<div class="p-3 bg-surface-container-lowest rounded-lg overflow-x-auto">
+<pre class="font-code-sm text-code-sm text-on-surface"><code>{
+  <span class="text-primary">"event"</span>: <span class="text-secondary">"NODE_HIGH_LATENCY"</span>,
+  <span class="text-primary">"host"</span>: <span class="text-secondary">"192.168.1.10"</span>,
+  <span class="text-primary">"alias"</span>: <span class="text-secondary">"truenas-primary"</span>,
+  <span class="text-primary">"latency_ms"</span>: <span class="text-secondary">182.4</span>,
+  <span class="text-primary">"threshold_ms"</span>: <span class="text-secondary">50.0</span>,
+  <span class="text-primary">"timestamp"</span>: <span class="text-secondary">"2025-05-12T14:23:01Z"</span>
+}</code></pre>
+</div>
+</div>
+<div class="bg-surface-container rounded-xl p-space-md space-y-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">notifications_active</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dispatch Strategies</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Configure debounce intervals and flapping protection directly in YAML:</p>
+<div class="p-3 bg-surface-container-lowest rounded-lg overflow-x-auto">
+<pre class="font-code-sm text-code-sm text-on-surface"><code><span class="text-primary">alerts</span>:
+  <span class="text-primary">flap_protection</span>: <span class="text-primary-fixed">true</span>
+  <span class="text-primary">debounce_window</span>: <span class="text-secondary">60s</span>
+  <span class="text-primary">channels</span>:
+    <span class="text-primary">discord</span>:
+      <span class="text-primary">webhook_url</span>: <span class="text-secondary">"https://discord.com/api/webhooks/..."</span>
+    <span class="text-primary">gotify</span>:
+      <span class="text-primary">endpoint</span>: <span class="text-secondary">"https://gotify.local/message"</span>
+      <span class="text-primary">token</span>: <span class="text-secondary">"A1b2C3d4E5f6"</span></code></pre>
+</div>
+</div>
+</div>
+<!-- Info / Tip Callout -->
+<div class="p-space-md rounded-xl bg-surface-container shadow-sm flex items-start gap-space-md relative overflow-hidden">
+<div class="w-1 self-stretch rounded-full bg-primary-container shrink-0"></div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">tips_and_updates</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-primary">Direct TCP Socket Routing</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Notifications bypass third-party relays entirely. If your WAN drops, internal Gotify and syslog alerts continue unimpeded over local LAN routing boundaries.
+              </p>
+</div>
+</div>
+</section>
+<!-- SECTION 5: TECHNICAL FAQ -->
+<section class="scroll-mt-24 space-y-space-lg" id="faq">
+<div class="flex items-center justify-between bg-surface-container px-space-lg py-space-sm rounded-xl">
+<div class="flex items-center gap-3">
+<span class="font-code-lg text-code-lg text-primary">05</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Frequently Asked Questions</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase">Homelab Ops</span>
+</div>
+<div class="space-y-3">
+<details class="group bg-surface-container rounded-xl p-space-md transition-all duration-200">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none text-on-surface font-headline-sm text-headline-sm group-open:text-primary">
+<span>Can I run Kestrel on an unprivileged Proxmox LXC?</span>
+<span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-180 text-on-surface-variant group-open:text-primary">expand_more</span>
+</summary>
+<div class="pt-space-sm font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Yes. Under unprivileged Proxmox LXC, simply append <code class="font-code-sm text-code-sm bg-surface-container-high px-1 rounded text-primary">lxc.cap.keep: net_raw net_admin</code> to your container configuration file in <code class="font-code-sm text-code-sm bg-surface-container-high px-1 rounded text-outline">/etc/pve/lxc/{id}.conf</code>. This grants synthetic raw ping capabilities without forfeiting unprivileged user namespace separation.
+              </div>
+</details>
+<details class="group bg-surface-container rounded-xl p-space-md transition-all duration-200">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none text-on-surface font-headline-sm text-headline-sm group-open:text-primary">
+<span>How much disk write activity occurs on flash storage?</span>
+<span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-180 text-on-surface-variant group-open:text-primary">expand_more</span>
+</summary>
+<div class="pt-space-sm font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Kestrel batches timeseries points in memory and executes synchronized disk flushes once every 60 seconds into a Write-Ahead Log (WAL). An average 64-node homelab generates under 12 MB of total flash writes every 24 hours, preventing wear on consumer SSDs and high-end microSD cards.
+              </div>
+</details>
+<details class="group bg-surface-container rounded-xl p-space-md transition-all duration-200">
+<summary class="flex items-center justify-between cursor-pointer list-none select-none text-on-surface font-headline-sm text-headline-sm group-open:text-primary">
+<span>Can Kestrel monitor VLANs across managed switches?</span>
+<span class="material-symbols-outlined transition-transform duration-200 group-open:rotate-180 text-on-surface-variant group-open:text-primary">expand_more</span>
+</summary>
+<div class="pt-space-sm font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Yes. With 802.1Q tagged sub-interfaces attached to the host (e.g. <code class="font-code-sm text-code-sm bg-surface-container-high px-1 rounded text-primary">eth0.10</code>, <code class="font-code-sm text-code-sm bg-surface-container-high px-1 rounded text-primary">eth0.20</code>) or an internal bridge, Kestrel inspects isolated subnets concurrently without routing between them, keeping sensitive management and IoT zones completely segmented.
+              </div>
+</details>
+</div>
+</section>
+<!-- PRE-FOOTER CTA CARD -->
+<section class="bg-surface-container rounded-xl p-space-xl shadow-lg relative overflow-hidden">
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-space-lg">
+<div class="space-y-space-xs text-left">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Deploy Anywhere</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">
+                Take control of your home network in 60 seconds.
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-lg">
+                Zero telemetry, zero cloud dependency, 100% open-source visibility. Run the automated deployment script on any Linux host.
+              </p>
+<!-- Quick Terminal Snippet -->
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-lowest font-code-sm text-code-sm text-on-surface mt-2">
+<span class="text-primary">$</span>
+<code>curl -fsSL https://get.kestrel.dev | sh</code>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center gap-space-sm shrink-0 w-full md:w-auto">
+<a class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-all duration-200 shadow-md" href="#">
+                Download Free for Linux &amp; Docker
+              </a>
+<a class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-full bg-surface-container-high text-on-surface hover:text-primary hover:bg-surface-container-highest transition-all duration-200 font-body-sm text-body-sm" href="#">
+                Explore GitHub
+              </a>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Smooth scroll and active state sync for Docs Sidebar
+  document.addEventListener('DOMContentLoaded', () => {
+    // Copy code button interaction
+    const copyBtn = document.getElementById('copy-btn');
+    const copyText = document.getElementById('copy-text');
+    const copyIcon = document.getElementById('copy-icon');
+    const dockerCmd = document.getElementById('docker-command');
+
+    if (copyBtn && dockerCmd) {
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = `docker run -d --name kestrel --restart=unless-stopped --net=host --cap-add=NET_RAW --cap-add=NET_ADMIN -v /var/run/docker.sock:/var/run/docker.sock -v ./kestrel.yaml:/etc/kestrel/kestrel.yaml -p 8080:8080 ghcr.io/kestrel-network/kestrel:latest`;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          copyText.textContent = 'Copied!';
+          copyIcon.textContent = 'check';
+          setTimeout(() => {
+            copyText.textContent = 'Copy snippet';
+            copyIcon.textContent = 'content_copy';
+          }, 2000);
+        });
+      });
+    }
+
+    // Scroll spy for doc nav
+    const sections = ['getting-started', 'installation', 'configuration', 'alerts', 'faq'];
+    const navLinks = document.querySelectorAll('#doc-nav a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const scrollPos = window.scrollY + 120;
+
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            current = id;
+          }
+        }
+      });
+
+      navLinks.forEach((link) => {
+        if (link.getAttribute('data-section') === current) {
+          link.classList.add('bg-surface-container-high', 'text-primary');
+          link.classList.remove('text-on-surface-variant');
+        } else {
+          link.classList.remove('bg-surface-container-high', 'text-primary');
+          link.classList.add('text-on-surface-variant');
+        }
+      });
+    });
+  });
+</script></main><footer class="w-full bg-[#151A23] border-t border-[#232A36] pt-space-2xl pb-space-xl text-on-surface"><div class="max-w-[1200px] mx-auto px-gutter"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-2xl"><div class="lg:col-span-2 pr-0 lg:pr-space-xl space-y-space-md"><div class="flex items-center gap-space-xs"><img alt="Kestrel Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1W8aqeX7EH-Xmmv-BmeQi1bhi7RV7mr7aAEXCD-8qbFiP8DKwpkAq-BeRG9-765GXOc-UKCIQu1ePLnW5qVluQ2zH7MejlCzsUSGll7FysDGYhd-R54UaIY7gHDU3wJgM08I-H9Qi5FIDXtc-pX0gjI4O0wgU3s37vcplgAcceYt7eP5wCEsXhehZR_Jr1lXwoTazaSA5IZtmWQ31YS02nY3a539AMJ1tBg4pYWL4TGiGPN4ihuqjF-Uw"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">KESTREL</span></div><p class="font-body-sm text-body-sm text-[#94A3B8] max-w-sm">Engineered for self-hosters and network architects. Continuous passive topology telemetry, localized packet diagnostics, and zero cloud footprint.</p><div class="space-y-space-xs pt-space-xs"><label class="block font-label-sm text-label-sm text-[#94A3B8] uppercase tracking-wider" for="newsletter-email">Stay tuned to releases</label><form class="flex items-center gap-2 max-w-sm" onsubmit="event.preventDefault();"><input class="w-full h-10 px-3 rounded-lg bg-[#0B0E14] border border-[#232A36] font-code-sm text-code-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none transition-colors" id="newsletter-email" placeholder="sysadmin@homelab.internal" type="email"/><button class="h-10 px-4 rounded-lg bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-colors whitespace-nowrap" type="submit">Subscribe</button></form></div></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Product</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="features" href="features.html">Features</a></li><li><a class="hover:text-primary transition-colors" data-path="architecture" href="#">Architecture</a></li><li><a class="hover:text-primary transition-colors" data-path="integrations" href="#">Integrations</a></li><li><a class="hover:text-primary transition-colors" data-path="changelog" href="#">Changelog</a></li><li><a class="hover:text-primary transition-colors" data-path="releases" href="#">Releases</a></li></ul></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Community</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="community-discord" href="#">Discord Homelab</a></li><li><a class="hover:text-primary transition-colors" data-path="community-reddit" href="#">Reddit r/homelab</a></li><li><a class="hover:text-primary transition-colors" data-path="community-github" href="#">GitHub</a></li><li><a class="hover:text-primary transition-colors" data-path="community-forum" href="#">Forum</a></li></ul></div><div class="space-y-space-sm"><h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider text-primary">Resources</h3><ul class="space-y-space-xs font-body-sm text-body-sm text-[#94A3B8]"><li><a class="hover:text-primary transition-colors" data-path="documentation" href="docs.html">Documentation</a></li><li><a class="hover:text-primary transition-colors" data-path="self-hosting-guide" href="#">Self-Hosting Guide</a></li><li><a class="hover:text-primary transition-colors" data-path="docker-compose" href="#">Docker / Compose</a></li><li><a class="hover:text-primary transition-colors" data-path="rest-api" href="#">REST API</a></li></ul></div></div><div class="pt-space-lg border-t border-[#232A36] flex flex-col md:flex-row items-center justify-between gap-space-sm"><p class="font-code-sm text-code-sm text-[#94A3B8]">© 2025 Kestrel Systems. Open source under AGPLv3. Zero cloud telemetry.</p><div class="flex items-center gap-space-md font-code-sm text-code-sm text-[#94A3B8]"><a class="hover:text-on-surface transition-colors" data-path="about" href="about.html">About Kestrel</a><a class="hover:text-on-surface transition-colors" data-path="manifesto" href="#">Open Source Manifesto</a><a class="hover:text-on-surface transition-colors" data-path="security-and-telemetry" href="#">Security &amp; Telemetry</a><a class="hover:text-on-surface transition-colors" data-path="contact" href="contact.html">Contact</a></div></div></div></footer><script>const toggleBtn = document.getElementById('mobile-toggle'); const mobileNav = document.getElementById('mobile-nav'); if (toggleBtn && mobileNav) { toggleBtn.addEventListener('click', () => { mobileNav.classList.toggle('hidden'); mobileNav.classList.toggle('mobile-menu-active'); toggleBtn.setAttribute('aria-expanded', String(!mobileNav.classList.contains('hidden'))); }); }</script></body></html>
